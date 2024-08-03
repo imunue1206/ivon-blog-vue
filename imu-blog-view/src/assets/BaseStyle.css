@@ -24,7 +24,6 @@
     font-size: 16px;
     color: #333;
     outline: none;
-    transition: box-shadow 0.3s ease;
 }
 
 .btn {
@@ -43,7 +42,6 @@
     font-size: 16px;
     color: #333;
     cursor: pointer;
-    transition: box-shadow 0.3s ease, transform 0.1s ease;
 }
 
 .black {
