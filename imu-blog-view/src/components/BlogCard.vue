@@ -2,23 +2,20 @@
     <div class="post box" @click="goToPost">
         <!-- 第一行：标题 -->
         <div class="post-title hide">{{ post.title }}</div>
-        <!-- 第二行：作者 -->
+
+        <!-- 第二行：部分内容 -->
+        <div class="post-excerpt">{{ post.excerpt }}</div>
+
+        <!-- 第三行：作者 -->
         <div class="post-author">
             作者: <a :href="`/author/${post.authorId}`">{{ post.author }}</a>
         </div>
-        <!-- 第三行：部分内容 -->
-        <div class="post-excerpt">{{ post.excerpt }}</div>
+
         <!-- 第四行：收藏、观看、评论 -->
         <div class="post-meta">
-            <span class="meta-item">
-                <a-icon type="heart" /> {{ post.favorites }} 收藏
-            </span>
-            <span class="meta-item">
-                <a-icon type="eye" /> {{ post.views }} 观看
-            </span>
-            <span class="meta-item">
-                <a-icon type="message" /> {{ post.comments }} 评论
-            </span>
+            <span> {{ post.favorites }} 收藏</span>
+            <span> {{ post.views }} 观看</span>
+            <span> {{ post.comments }} 评论</span>
         </div>
     </div>
 </template>
@@ -37,20 +34,24 @@ const props = defineProps({
 const router = useRouter();
 
 const goToPost = () => {
-    router.push(`/post/${props.post.id}`);
+    router.push(`/read/${props.post.id}`);
 };
 </script>
 
 <style scoped>
 .post {
-    width: 300px;
-    height: 150px;
+    width: 320px;
+    height: 110px;
+    /* 减少高度 */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
+    gap: 5px;
+    /* 减少间距 */
+    padding: 5px;
+    /* 减少内边距 */
+    margin-bottom: 10px;
+    /* 减少外边距 */
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     cursor: pointer;
@@ -58,16 +59,24 @@ const goToPost = () => {
 
 .post-title {
     width: 100%;
-    height: 25px;
-    font-size: 18px;
+    height: 20px;
+    /* 减少高度 */
+    font-size: 16px;
+    /* 减少字体大小 */
     font-weight: bold;
     color: #333;
 }
 
 .post-author {
+    display: flex;
+    height: 15px;
     width: 100%;
-    padding-left: 10px;
-    font-size: 14px;
+    justify-content: flex-end;
+    padding-right: 5px;
+    padding-left: 8px;
+    /* 减少内边距 */
+    font-size: 12px;
+    /* 减少字体大小 */
     color: #666;
 }
 
@@ -77,7 +86,10 @@ const goToPost = () => {
 }
 
 .post-excerpt {
-    font-size: 14px;
+    width: 100%;
+    height: 40px;
+    font-size: 12px;
+    /* 减少字体大小 */
     color: #555;
     line-height: 1.4;
     overflow: hidden;
@@ -88,16 +100,15 @@ const goToPost = () => {
 }
 
 .post-meta {
+    width: 100%;
+    height: 15px;
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    font-size: 14px;
+    padding-right: 5px;
+    gap: 10px;
+    /* 减少间距 */
+    font-size: 12px;
+    /* 减少字体大小 */
     color: #888;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }
 </style>

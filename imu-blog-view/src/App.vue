@@ -11,14 +11,14 @@
         </footer>
 
         <!-- Settings Float Button -->
-        <a-float-button @click="drawerVisible = true" style="bottom: 30px; left: 20px;">
+        <a-float-button @click="drawerVisible = true" style="bottom: 20px; left: 20px;">
             <template #icon>
                 <SettingOutlined />
             </template>
         </a-float-button>
 
         <!-- Back to Home Float Button -->
-        <a-float-button v-if="!isHome" @click="goHome" style="bottom: 80px; left: 20px;">
+        <a-float-button v-if="!isHome" @click="goHome" style="bottom: 70px; left: 20px;">
             <template #icon>
                 <HomeOutlined />
             </template>
@@ -164,6 +164,6 @@ export default {
     position: fixed;
     
     right: 20px;
-    bottom: 30px;
+    bottom: 20px;
 }
 </style>

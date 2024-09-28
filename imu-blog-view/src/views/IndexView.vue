@@ -1,8 +1,8 @@
 <template>
-    <div class="index-box">
+    <div class="index-box center">
         <!-- 顶部窄长按钮 -->
-        <div class="top-button-box" @click="drawerVisible = true">
-            <div class="top-button center">你想要搜索什么？</div>
+        <div class="top-search-button-box" @click="drawerVisible = true">
+            <div class="top-search-button center">你想要搜索什么？</div>
         </div>
 
         <!-- 主体内容 -->
@@ -104,30 +104,30 @@ onMounted(() => {
 
 <style scoped>
 .index-box {
+    flex-direction: column;
+    width: 100%;
     position: relative;
-    padding-top: 35px;
-    /* 为按钮腾出空间 */
+    padding-top: 30px;
 }
 
-.top-button-box {
-    height: 35px;
+.top-search-button-box {
+    height: 30px;
     margin-left: 10%;
     width: 80%;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
-    margin-bottom: 10px;
 }
 
-.top-button {
-    height: 30px;
+.top-search-button {
+    height: 25px;
     margin-left: 15%;
     width: 70%;
     cursor: pointer;
     font-size: 12px;
     color: grey;
-    background-color: #f1f1f1;
+    background-color: #d3d3d3;
     position: fixed;
     top: 0;
     left: 0;
