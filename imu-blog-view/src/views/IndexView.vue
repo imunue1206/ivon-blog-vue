@@ -1,166 +1,111 @@
 <template>
-    <div class="index-box">
-        <!-- 顶部窄长按钮 -->
-        <div class="top-button-box" @click="drawerVisible = true">
-            <div class="top-button center">你想要搜索什么？</div>
-        </div>
+    <v-container>
+        <v-row>
+            <v-toolbar density="compact" class="rounded-lg">
+                <v-row no-gutter>
 
-        <!-- 主体内容 -->
-        <a-spin :spinning="loading">
-            <BlogCard v-for="post in visiblePosts" :key="post.id" :post="post" />
-        </a-spin>
+                    <!-- 筛选按钮 -->
+                    <v-col cols="2" class="pl-4">
+                        <v-btn icon size="small" @click="openFilterDialog">
+                            <v-icon>mdi-filter</v-icon>
+                        </v-btn>
+                    </v-col>
 
-        <!-- 查看更多按钮 -->
-        <div v-if="showLoadMore" class="load-more-box">
-            <a-button type="text" @click="loadMore">查看更多</a-button>
-        </div>
+                    <!-- 搜索框 -->
+                    <v-col cols="8">
+                        <v-text-field :loading="isLoading" :color="loadingColor" density="compact" hide-details
+                            single-line clearable variant="outlined" class="bg-white"></v-text-field>
+                    </v-col>
 
-        <!-- 顶部下拉Drawer -->
-        <a-drawer placement="top" :visible="drawerVisible" @close="drawerVisible = false" :closable="false" height="90">
-            <div class="center">
-                <input type="text" class="input search-input" placeholder="请输入搜索内容..." />
-                <button class="btn search-btn">
-                    <SearchOutlined></SearchOutlined>
-                </button>
-            </div>
-        </a-drawer>
-    </div>
+                    <!-- 搜索按钮 -->
+                    <v-col cols="2" class="pr-4">
+                        <v-btn size="small" icon @click="triggerLoading">
+                            <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                    </v-col>
+
+                </v-row>
+            </v-toolbar>
+
+            <!-- 筛选弹窗 -->
+            <v-dialog v-model="isFilterDialogOpen" max-width="600px">
+                <v-card>
+                    <v-card-title>筛选条件</v-card-title>
+                    <v-card-text>
+
+                        <!-- 滑块选择时间范围 -->
+                        <p>当前选择：{{ timeRangeLabels[selectedTimeRange] }}</p>
+                        <v-slider v-model="selectedTimeRange" :min="0" :max="7" :step="1" ticks="always" tick-size="4"
+                            :labels="timeRangeLabels" dense></v-slider>
+
+
+                        <!-- 类型标签选择 -->
+                        <v-select v-model="selectedTag" :items="tags" label="选择类型标签" multiple chips
+                            clearable></v-select>
+
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn text @click="closeFilterDialog">取消</v-btn>
+                        <v-btn text @click="applyFilters">应用</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-row>
+    </v-container>
 </template>
 
 <script setup>
-import BlogCard from '../components/BlogCard.vue';
-import { ref, onMounted } from 'vue';
-import { SearchOutlined } from '@ant-design/icons-vue';
+import { ref } from 'vue';
 
-// 初始化和加载数量设置
-const initialLoadCount = 10; // 初始化加载数量
-const loadCount = 10; // 每次加载的数量
-const maxRetainCount = 60; // 最大保留数量
+// 控制loading状态
+const isLoading = ref(false);
+const loadingColor = ref("");
+const isFilterDialogOpen = ref(false);
 
-// 数据和状态
-const posts = ref([]);
-const visiblePosts = ref([]);
-const drawerVisible = ref(false);
-const showLoadMore = ref(false);
-const loading = ref(false); // 添加loading状态
-let start = 0; // 用于跟踪拉取数据的起始位置
+// 时间范围滑块的值
+const selectedTimeRange = ref(7);
 
-// 模拟的API请求函数
-async function fetchData(start, count) {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const data = Array.from({ length: count }, (_, index) => ({
-        id: start + index,
-        title: `Post Title ${start + index}`,
-        author: `Author ${start + index}`,
-        authorId: start + index,
-        excerpt: `This is an excerpt of post ${start + index}...`,
-        favorites: Math.floor(Math.random() * 1000),
-        views: Math.floor(Math.random() * 10000),
-        comments: Math.floor(Math.random() * 100),
-    }));
-    return data;
-}
+// 滑块标签，对应不同的时间范围
+const timeRangeLabels = [
+    '三天内',
+    '一周内',
+    '1个月内',
+    '3个月内',
+    '6个月内',
+    '1年内',
+    '三年内',
+    '所有时间'
+];
 
-// 初始化数据加载
-const loadInitialData = async () => {
-    loading.value = true; // 开始加载
-    const initialData = await fetchData(start, initialLoadCount);
-    posts.value = initialData;
-    visiblePosts.value = initialData;
-    showLoadMore.value = initialData.length === initialLoadCount;
-    start += initialLoadCount;
-    loading.value = false; // 结束加载
+// 类型标签数据
+const selectedTag = ref([]);
+const tags = ['MySql', '设计模式', 'Redis', '函数式编程','方法论'];
+
+const triggerLoading = () => {
+    isLoading.value = true;
+    loadingColor.value = 'green'
+    setTimeout(() => {
+        isLoading.value = false;
+        loadingColor.value = ''
+    }, 1000);
 };
 
-// 加载更多数据
-const loadMore = async () => {
-    loading.value = true; // 开始加载
-    const moreData = await fetchData(start, loadCount);
-    posts.value = posts.value.concat(moreData);
-    visiblePosts.value = posts.value;
-
-    // 如果超过最大保留数量，从第20到第30条删除
-    if (posts.value.length > maxRetainCount) {
-        posts.value.splice(20, 10);
-    }
-
-    visiblePosts.value = posts.value;
-    showLoadMore.value = moreData.length === loadCount;
-    start += loadCount;
-    loading.value = false; // 结束加载
+// 打开筛选弹窗
+const openFilterDialog = () => {
+    isFilterDialogOpen.value = true;
 };
 
-// 回到顶部
-const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+// 关闭筛选弹窗
+const closeFilterDialog = () => {
+    isFilterDialogOpen.value = false;
 };
 
-// 组件挂载时加载初始数据
-onMounted(() => {
-    loadInitialData();
-});
+// 应用筛选条件
+const applyFilters = () => {
+    console.log('选择的时间范围:', timeRangeLabels[selectedTimeRange.value]);
+    closeFilterDialog();
+};
 </script>
 
-
 <style scoped>
-.index-box {
-    position: relative;
-    padding-top: 35px;
-    /* 为按钮腾出空间 */
-}
-
-.top-button-box {
-    height: 35px;
-    margin-left: 10%;
-    width: 80%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    margin-bottom: 10px;
-}
-
-.top-button {
-    height: 30px;
-    margin-left: 15%;
-    width: 70%;
-    cursor: pointer;
-    font-size: 12px;
-    color: grey;
-    background-color: #f1f1f1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    border-radius: 0 0 30px 30px;
-    border: 0px;
-}
-
-.drawer-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 16px;
-    height: 100%;
-}
-
-.search-input {
-    width: 60%;
-    height: 40px;
-    margin: 0px;
-    font-size: 13px;
-}
-
-.search-btn {
-    width: 35px;
-    height: 40px;
-    margin: 0px;
-    margin-left: 10px;
-}
-
-.load-more-box {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
 </style>
