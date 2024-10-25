@@ -1,31 +1,32 @@
 <template>
-    <v-container>
+    <v-container class="pt-1">
         <v-row>
-            <v-toolbar density="compact" class="rounded-lg">
-                <v-row no-gutter>
+            <v-col vols="12" lg="8" offset-lg="2">
+                <v-toolbar density="compact" :elevation="6" class="rounded-lg">
+                    <v-row no-gutter>
+                        <!-- 筛选按钮 -->
+                        <v-col cols="2" class="pr-0 d-flex justify-start pl-5">
+                            <v-btn icon size="small" @click="openFilterDialog">
+                                <v-icon>mdi-filter</v-icon>
+                            </v-btn>
+                        </v-col>
 
-                    <!-- 筛选按钮 -->
-                    <v-col cols="2" class="pl-4">
-                        <v-btn icon size="small" @click="openFilterDialog">
-                            <v-icon>mdi-filter</v-icon>
-                        </v-btn>
-                    </v-col>
+                        <!-- 搜索框 -->
+                        <v-col cols="8">
+                            <v-text-field :loading="isLoading" :color="loadingColor" density="compact" hide-details
+                                single-line clearable class="bg-white"></v-text-field>
+                        </v-col>
 
-                    <!-- 搜索框 -->
-                    <v-col cols="8">
-                        <v-text-field :loading="isLoading" :color="loadingColor" density="compact" hide-details
-                            single-line clearable variant="outlined" class="bg-white"></v-text-field>
-                    </v-col>
+                        <!-- 搜索按钮 -->
+                        <v-col cols="2" class="pl-0 d-flex justify-end pr-5">
+                            <v-btn size="small" icon @click="triggerLoading">
+                                <v-icon>mdi-magnify</v-icon>
+                            </v-btn>
+                        </v-col>
 
-                    <!-- 搜索按钮 -->
-                    <v-col cols="2" class="pr-4">
-                        <v-btn size="small" icon @click="triggerLoading">
-                            <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
-                    </v-col>
-
-                </v-row>
-            </v-toolbar>
+                    </v-row>
+                </v-toolbar>
+            </v-col>
 
             <!-- 筛选弹窗 -->
             <v-dialog v-model="isFilterDialogOpen" max-width="600px">
@@ -98,12 +99,13 @@ const openFilterDialog = () => {
 // 关闭筛选弹窗
 const closeFilterDialog = () => {
     isFilterDialogOpen.value = false;
+    selectedTimeRange.value = 7;
+    selectedTag.value=[]
 };
 
 // 应用筛选条件
 const applyFilters = () => {
-    console.log('选择的时间范围:', timeRangeLabels[selectedTimeRange.value]);
-    closeFilterDialog();
+    isFilterDialogOpen.value = false;
 };
 </script>
 
