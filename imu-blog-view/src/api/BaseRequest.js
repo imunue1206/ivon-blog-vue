@@ -1,23 +1,20 @@
 import axios from 'axios';
-import { message } from 'ant-design-vue'
-
-
 
 // 创建axios实例
 const apiRequest = axios.create({
-    baseURL: 'https://your-api-base-url.com/api', // API的基础URL
+    baseURL: 'http://127.0.0.1:7070/imu-blog-service', // API的基础URL
     timeout: 3000, // 请求超时时间
 });
 
 // 请求拦截器
 apiRequest.interceptors.request.use(
     config => {
-        // 可以在这里添加请求头等信息
         // config.headers['Authorization'] = `Bearer ${token}`;
         return config;
     },
     error => {
-        console.error(error);
+        // 客户端请求出错时触发
+        window.dispatchEvent(new CustomEvent('axiosGlobalErrorHandle', { detail: error.message || '客户端请求出错' }));
         return Promise.reject(error);
     }
 );
@@ -26,16 +23,22 @@ apiRequest.interceptors.request.use(
 apiRequest.interceptors.response.use(
     response => {
         const res = response.data;
-        if (res.code !== 200) { // 根据实际API定义修改
-            message.error(res.message || 'Error');
+        if (res.code !== 200) {
+            // 根据后端返回的响应码判断错误
+            window.dispatchEvent(new CustomEvent('axiosGlobalErrorHandle', { detail: res.message || '服务端响应出错' }));
             return Promise.reject(new Error(res.message || 'Error'));
         } else {
             return res;
         }
     },
     error => {
-        console.error(error); // 用于调试
-        message.error(error.message || 'Request failed');
+        // 捕捉服务端的响应错误
+        let errorMessage = '服务端响应失败';
+        if (error.response) {
+            // 服务器有响应但状态码不是2xx
+            errorMessage = `错误 ${error.response.status}: ${error.response.statusText || error.message}`;
+        }
+        window.dispatchEvent(new CustomEvent('axiosGlobalErrorHandle', { detail: errorMessage }));
         return Promise.reject(error);
     }
 );
